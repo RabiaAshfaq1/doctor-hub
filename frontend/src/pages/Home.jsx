@@ -18,9 +18,11 @@ import {
   Lock,
   Sparkles,
   ArrowRight,
-  HeartPulse,
   BarChart3,
   Quote,
+  Users,
+  Video,
+  BadgeCheck,
 } from 'lucide-react';
 import api from '../api/api';
 import { formatCurrency } from '../utils/currency';
@@ -30,6 +32,13 @@ const HERO_LINE1 = ['Healthcare', 'booking,'];
 const HERO_LINE2 = ['reimagined', 'for', '2026.'];
 
 const QUICK_CHIPS = ['Fever', 'Diabetes', 'Heart', 'Skin', 'Migraine', 'Allergy'];
+
+const HERO_TRUST_BADGES = [
+  { icon: Users, label: '10,000+ patients', sub: 'Trusted nationwide' },
+  { icon: Shield, label: 'Secure platform', sub: 'End-to-end encrypted' },
+  { icon: Clock, label: '24/7 access', sub: 'Book anytime' },
+  { icon: Lock, label: 'Clinical-grade security', sub: 'HIPAA-style controls' },
+];
 
 const TRUST_ITEMS = [
   { icon: Shield, label: 'Verified practitioners' },
@@ -224,57 +233,83 @@ function getInitials(name) {
 function HeroFloatCards() {
   return (
     <div className="lp-hero-visual" aria-hidden="true">
-      <div className="lp-float lp-float--doctor">
+      <div className="lp-gradient-ring" />
+      <div className="lp-glow-dot lp-glow-dot--1" />
+      <div className="lp-glow-dot lp-glow-dot--2" />
+      <div className="lp-glow-dot lp-glow-dot--3" />
+
+      {/* Doctor availability */}
+      <div className="lp-float lp-float--doctor animate-float-slow">
         <div className="lp-float__header">
           <div className="lp-float__avatar">SC</div>
           <div>
             <strong>Dr. Sarah Connor</strong>
-            <span>Cardiologist</span>
+            <span>Cardiologist · Available now</span>
           </div>
           <span className="lp-pulse" title="Online" />
         </div>
         <div className="lp-float__meta">
           <span className="lp-float__tag">Verified</span>
-          <span>4.9 ★</span>
+          <span>Next slot · 2:30 PM</span>
         </div>
       </div>
 
-      <div className="lp-float lp-float--appt">
+      {/* Appointment */}
+      <div className="lp-float lp-float--appt animate-float-slow animate-float-delay">
         <Calendar size={16} />
         <div>
           <strong>Appointment confirmed</strong>
-          <span>Tomorrow · 2:30 PM</span>
+          <span>Tomorrow · Video consult</span>
         </div>
         <CheckCircle size={18} className="lp-float__check" />
       </div>
 
-      <div className="lp-float lp-float--chart">
+      {/* Analytics */}
+      <div className="lp-float lp-float--chart animate-float-slow animate-float-reverse">
         <div className="lp-float__chart-head">
           <Activity size={16} />
-          <span>Platform health</span>
+          <span>Health analytics</span>
         </div>
         <div className="lp-float__bars">
           {[40, 65, 45, 80, 55, 90].map((h, i) => (
             <span key={i} style={{ height: `${h}%` }} />
           ))}
         </div>
-        <strong>98% satisfaction</strong>
+        <strong>98% care satisfaction</strong>
       </div>
 
-      <div className="lp-float lp-float--insight">
-        <HeartPulse size={18} />
+      {/* Patient success */}
+      <div className="lp-float lp-float--success animate-float-slow animate-float-delay animate-float-reverse">
+        <BadgeCheck size={18} />
         <div>
-          <strong>Care insight</strong>
-          <span>Hypertension follow-up on track</span>
+          <strong>Patient success</strong>
+          <span>Booking completed in 47 seconds</span>
         </div>
+        <Star size={14} className="lp-float__star" />
       </div>
 
-      <div className="lp-hero-icon lp-hero-icon--1">
+      {/* Live consultation */}
+      <div className="lp-float lp-float--live animate-float-slow">
+        <span className="lp-live-dot" />
+        <Video size={14} />
+        <span>Live consultation</span>
+      </div>
+
+      <div className="lp-hero-icon lp-hero-icon--1 animate-float-slow animate-float-delay">
         <Stethoscope size={20} />
       </div>
-      <div className="lp-hero-icon lp-hero-icon--2">
+      <div className="lp-hero-icon lp-hero-icon--2 animate-float-slow animate-float-reverse">
         <Shield size={18} />
       </div>
+    </div>
+  );
+}
+
+function SectionAmbient({ variant = 'default' }) {
+  return (
+    <div className={`lp-ambient lp-ambient--${variant}`} aria-hidden="true">
+      <div className="lp-ambient__orb" />
+      <div className="lp-ambient__orb lp-ambient__orb--2" />
     </div>
   );
 }
@@ -354,13 +389,18 @@ const Home = () => {
           <div className="lp-orb lp-orb--1" />
           <div className="lp-orb lp-orb--2" />
           <div className="lp-orb lp-orb--3" />
+          <div className="lp-orb lp-orb--4" />
           <div className="lp-ray lp-ray--1" />
           <div className="lp-ray lp-ray--2" />
+          <div className="lp-ray lp-ray--3" />
+          <div className="lp-streak lp-streak--1" />
+          <div className="lp-streak lp-streak--2" />
           <div className="lp-mesh-gradient" />
+          <div className="lp-mesh-gradient lp-mesh-gradient--2" />
           <div className="lp-noise" />
           <div className="lp-grid-lines" />
           <div className="lp-particles" aria-hidden="true">
-            {[...Array(8)].map((_, i) => (
+            {[...Array(14)].map((_, i) => (
               <span key={i} className="lp-particle" style={{ '--i': i }} />
             ))}
           </div>
@@ -376,9 +416,24 @@ const Home = () => {
             <h1 className="lp-hero-title">
               <span className="lp-hero-title__line">{renderWords(HERO_LINE1, false)}</span>
               <span className="lp-hero-title__line lp-hero-title__line--accent">
-                {renderWords(HERO_LINE2, true)}
+                {renderWords(HERO_LINE2.slice(0, 2), true)}
+                <span className="lp-hero-shimmer">{HERO_LINE2[2]}</span>
               </span>
             </h1>
+
+            <div className="lp-hero-trust lp-reveal" style={{ transitionDelay: '0.28s' }}>
+              {HERO_TRUST_BADGES.map(({ icon: Icon, label, sub }) => (
+                <div key={label} className="lp-hero-trust__badge">
+                  <div className="lp-hero-trust__icon">
+                    <Icon size={16} />
+                  </div>
+                  <div>
+                    <strong>{label}</strong>
+                    <span>{sub}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <p className="lp-hero-lead lp-reveal" style={{ transitionDelay: '0.35s' }}>
               The modern care OS for patients, doctors, assistants, and admins — search specialists,
@@ -386,11 +441,11 @@ const Home = () => {
             </p>
 
             <div className="lp-hero-cta lp-reveal" style={{ transitionDelay: '0.45s' }}>
-              <MagneticBtn to="/doctors" className="lp-btn lp-btn--primary lp-btn--shine">
+              <MagneticBtn to="/doctors" className="lp-btn lp-btn--primary lp-btn--shine lp-btn--premium">
                 Find a doctor
                 <ArrowRight size={18} />
               </MagneticBtn>
-              <MagneticBtn to="/register" className="lp-btn lp-btn--glass">
+              <MagneticBtn to="/register" className="lp-btn lp-btn--glass lp-btn--premium">
                 Create free account
               </MagneticBtn>
             </div>
@@ -426,7 +481,7 @@ const Home = () => {
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   />
                 </div>
-                <button type="button" className="lp-btn lp-btn--primary lp-btn--search lp-btn--shine" onClick={() => handleSearch()}>
+                <button type="button" className="lp-btn lp-btn--primary lp-btn--search lp-btn--shine lp-btn--premium" onClick={() => handleSearch()}>
                   <Search size={18} />
                   Search
                 </button>
@@ -463,7 +518,8 @@ const Home = () => {
 
       {/* Stats */}
       <section className="lp-stats" id="lp-stats">
-        <div className="lp-stats__card lp-reveal">
+        <SectionAmbient variant="stats" />
+        <div className="lp-stats__card lp-reveal lp-reveal--up">
           <StatCounter end={500} suffix="+" label="Verified doctors" />
           <StatCounter end={10000} suffix="+" label="Patients served" />
           <StatCounter end={3} suffix="" label="Treatment modalities" />
@@ -472,8 +528,9 @@ const Home = () => {
       </section>
 
       {/* Features */}
-      <section className="lp-section">
-        <div className="lp-section-head lp-reveal">
+      <section className="lp-section lp-section--glow">
+        <SectionAmbient variant="features" />
+        <div className="lp-section-head lp-reveal lp-reveal--fade">
           <p className="lp-eyebrow">Platform</p>
           <h2 className="lp-h2">
             Built for <span className="lp-text-gradient">modern clinical teams</span>
@@ -484,7 +541,7 @@ const Home = () => {
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             return (
-              <article key={f.title} className="lp-feature-card lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
+              <article key={f.title} className="lp-feature-card lp-feature-card--glass lp-reveal lp-reveal--up" style={{ transitionDelay: `${i * 0.12}s` }}>
                 <div className="lp-feature-card__icon">
                   <Icon size={24} />
                 </div>
@@ -497,8 +554,9 @@ const Home = () => {
       </section>
 
       {/* How it works */}
-      <section className="lp-section lp-section--mesh">
-        <div className="lp-section-head lp-reveal">
+      <section className="lp-section lp-section--mesh lp-section--glow">
+        <SectionAmbient variant="mesh" />
+        <div className="lp-section-head lp-reveal lp-reveal--fade">
           <p className="lp-eyebrow">Workflow</p>
           <h2 className="lp-h2">From search to <span className="lp-text-gradient">confirmed visit</span></h2>
         </div>
@@ -589,8 +647,9 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="lp-section lp-section--mesh">
-        <div className="lp-section-head lp-reveal">
+      <section className="lp-section lp-section--mesh lp-section--glow">
+        <SectionAmbient variant="testimonials" />
+        <div className="lp-section-head lp-reveal lp-reveal--fade">
           <p className="lp-eyebrow">Social proof</p>
           <h2 className="lp-h2">Loved by <span className="lp-text-gradient">patients & clinics</span></h2>
         </div>
@@ -624,7 +683,7 @@ const Home = () => {
             Join thousands of patients and practitioners on Pakistan&apos;s most modern healthcare booking platform.
           </p>
           <div className="lp-cta__actions">
-            <MagneticBtn to="/register" className="lp-btn lp-btn--white lp-btn--shine">
+            <MagneticBtn to="/register" className="lp-btn lp-btn--white lp-btn--shine lp-btn--premium">
               Start for free
               <ArrowRight size={18} />
             </MagneticBtn>
