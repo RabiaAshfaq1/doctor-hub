@@ -59,13 +59,23 @@ const PublicLayout = ({ children }) => {
   );
 };
 
+// Landing page — full-bleed, no dashboard padding
+const LandingLayout = ({ children }) => {
+  return (
+    <div className="app-container landing-app">
+      <Navbar variant="landing" />
+      <main className="landing-main">{children}</main>
+    </div>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+          <Route path="/" element={<LandingLayout><Home /></LandingLayout>} />
           <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
           <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
           <Route path="/doctors" element={<PublicLayout><DoctorSearch /></PublicLayout>} />

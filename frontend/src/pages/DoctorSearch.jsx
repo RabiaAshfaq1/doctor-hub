@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api/api';
 import { Search, Filter, Stethoscope, MapPin, IndianRupee, Award } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 
 const DoctorSearch = () => {
+  const [searchParams] = useSearchParams();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [specialization, setSpecialization] = useState('');
-  const [treatmentType, setTreatmentType] = useState('');
+  const [treatmentType, setTreatmentType] = useState(searchParams.get('treatment_type') || '');
   const [error, setError] = useState('');
 
   const fetchDoctors = async () => {
@@ -33,7 +34,11 @@ const DoctorSearch = () => {
   };
 
   useEffect(() => {
-    // Debounce search/filters
+    setSearch(searchParams.get('search') || '');
+    setTreatmentType(searchParams.get('treatment_type') || '');
+  }, [searchParams]);
+
+  useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchDoctors();
     }, 400);
