@@ -149,22 +149,100 @@ const seedData = async () => {
       await doctorPending.update({ consultation_fee: 5000 }, { transaction });
     }
 
+    let doctorAyesha;
+    await ensureUser(
+      transaction,
+      {
+        email: 'doctor3@doctorhub.com',
+        name: 'Dr. Ayesha Khan',
+        role: ROLES.DOCTOR,
+        phone: '555-555-5557'
+      },
+      async (user) => {
+        doctorAyesha = await Doctor.create(
+          {
+            user_id: user.id,
+            specialization: 'Dermatologist',
+            treatment_type: 'herbal',
+            license_no: 'PMC-44556-H',
+            bio: 'Herbal dermatology and plant-based skin care protocols.',
+            is_approved: true,
+            consultation_fee: 4500
+          },
+          { transaction }
+        );
+      }
+    );
+    if (!doctorAyesha) {
+      const u = await User.findOne({ where: { email: 'doctor3@doctorhub.com' }, transaction });
+      doctorAyesha = await Doctor.findOne({ where: { user_id: u.id }, transaction });
+      if (doctorAyesha && !doctorAyesha.is_approved) {
+        await doctorAyesha.update({ is_approved: true }, { transaction });
+      }
+    }
+
+    let doctorHina;
+    await ensureUser(
+      transaction,
+      {
+        email: 'doctor4@doctorhub.com',
+        name: 'Dr. Hina Malik',
+        role: ROLES.DOCTOR,
+        phone: '555-555-5558'
+      },
+      async (user) => {
+        doctorHina = await Doctor.create(
+          {
+            user_id: user.id,
+            specialization: 'Homeopathic Physician',
+            treatment_type: 'homeopathic',
+            license_no: 'PMC-77889-H',
+            bio: 'Classical homeopathy with chronic care follow-ups.',
+            is_approved: true,
+            consultation_fee: 5500
+          },
+          { transaction }
+        );
+      }
+    );
+    if (!doctorHina) {
+      const u = await User.findOne({ where: { email: 'doctor4@doctorhub.com' }, transaction });
+      doctorHina = await Doctor.findOne({ where: { user_id: u.id }, transaction });
+      if (doctorHina && !doctorHina.is_approved) {
+        await doctorHina.update({ is_approved: true }, { transaction });
+      }
+    }
+
     // ─── 3. Clinics ────────────────────────────────────────────
     console.log('\n[Clinics]');
     const clinicDefs = [
       {
         doctor: doctorSarah,
         name: 'City Cardiology & Health',
-        address: '405 Park Avenue Suite 12',
-        city: 'New York',
+        address: '12 Mall Road, Gulberg',
+        city: 'Lahore',
         timings_json: 'Monday - Friday (09:00 AM - 05:00 PM)'
       },
       {
         doctor: doctorJames,
         name: 'Wilson Neurology Center',
-        address: '88 Medical Plaza, Floor 3',
-        city: 'Chicago',
+        address: '88 Blue Area, Floor 3',
+        city: 'Islamabad',
         timings_json: 'Tuesday - Saturday (10:00 AM - 06:00 PM)'
+      },
+      {
+        doctor: doctorAyesha,
+        name: 'Khan Herbal Skin Clinic',
+        address: '45 Clifton Block 5',
+        city: 'Karachi',
+        timings_json: 'Monday - Saturday (11:00 AM - 07:00 PM)'
+      },
+      {
+        doctor: doctorHina,
+        name: 'Malik Homeopathy Care',
+        address: '22 Model Town Link Road',
+        city: 'Lahore',
+        timings_json: 'Monday - Friday (10:00 AM - 06:00 PM)'
       }
     ];
 
@@ -182,6 +260,9 @@ const seedData = async () => {
           { transaction }
         );
         console.log(`  + Clinic: ${def.name}`);
+      } else {
+        const { doctor, ...clinicFields } = def;
+        await clinic.update(clinicFields, { transaction });
       }
       clinics[def.doctor.id] = clinic;
     }

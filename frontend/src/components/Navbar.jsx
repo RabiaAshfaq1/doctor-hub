@@ -3,22 +3,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Stethoscope, LogOut, Menu, X } from 'lucide-react';
 
-const Navbar = ({ variant }) => {
+const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isLanding = variant === 'landing' || location.pathname === '/';
 
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isLanding) return;
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLanding]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -46,18 +36,9 @@ const Navbar = ({ variant }) => {
     }
   };
 
-  const headerClass = [
-    'navbar',
-    isLanding ? 'navbar-landing' : '',
-    isLanding && scrolled ? 'navbar-scrolled' : '',
-    mobileOpen ? 'nav-mobile-open' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
   const authButtons = isAuthenticated ? (
     <>
-      <Link to={getDashboardPath()} className={isLanding ? 'nav-link-landing' : 'nav-link'}>
+      <Link to={getDashboardPath()} className="nav-link">
         Dashboard
       </Link>
       <div
@@ -65,9 +46,9 @@ const Navbar = ({ variant }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
-          marginLeft: isLanding ? 0 : '1rem',
-          borderLeft: isLanding ? 'none' : '1px solid var(--border)',
-          paddingLeft: isLanding ? 0 : '1rem',
+          marginLeft: '1rem',
+          borderLeft: '1px solid var(--border)',
+          paddingLeft: '1rem',
         }}
       >
         <span className="nav-user-name" style={{ fontSize: '0.9rem', fontWeight: 600 }}>
@@ -76,7 +57,7 @@ const Navbar = ({ variant }) => {
         <button
           type="button"
           onClick={handleLogout}
-          className={isLanding ? 'btn-landing-outline' : 'btn btn-outline btn-sm'}
+          className="btn btn-outline btn-sm"
           title="Log Out"
           style={{ padding: '0.4rem 0.65rem' }}
         >
@@ -86,26 +67,22 @@ const Navbar = ({ variant }) => {
     </>
   ) : (
     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-      <Link to="/login" className={isLanding ? 'btn-landing-outline' : 'btn btn-outline btn-sm'}>
-        {isLanding ? 'Login' : 'Sign In'}
+      <Link to="/login" className="btn btn-outline btn-sm">
+        Sign In
       </Link>
-      <Link to="/register" className={isLanding ? 'btn-landing-primary' : 'btn btn-primary btn-sm'}>
+      <Link to="/register" className="btn btn-primary btn-sm">
         Register
       </Link>
     </div>
   );
 
   return (
-    <header className={headerClass}>
-      <Link to="/" className={isLanding ? 'brand-landing' : 'brand'}>
-        <Stethoscope className={isLanding ? 'brand-icon' : ''} size={28} style={isLanding ? undefined : { color: 'var(--primary)' }} />
-        {isLanding ? (
-          <span>Doctor Hub</span>
-        ) : (
-          <span>
-            Doctor<span className="brand-accent">Hub</span>
-          </span>
-        )}
+    <header className={`navbar ${mobileOpen ? 'nav-mobile-open' : ''}`}>
+      <Link to="/" className="brand">
+        <Stethoscope size={28} style={{ color: 'var(--primary)' }} />
+        <span>
+          Doctor<span className="brand-accent">Hub</span>
+        </span>
       </Link>
 
       <button
@@ -118,19 +95,13 @@ const Navbar = ({ variant }) => {
         {mobileOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      <nav className={`nav-links ${isLanding ? 'nav-links-landing' : ''} ${mobileOpen ? 'nav-open' : ''}`}>
-        {!isLanding && (
-          <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-            Home
-          </Link>
-        )}
+      <nav className={`nav-links ${mobileOpen ? 'nav-open' : ''}`}>
+        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+          Home
+        </Link>
         <Link
           to="/doctors"
-          className={
-            isLanding
-              ? `nav-link-landing ${location.pathname.startsWith('/doctors') ? 'active' : ''}`
-              : `nav-link ${location.pathname.startsWith('/doctors') ? 'active' : ''}`
-          }
+          className={`nav-link ${location.pathname.startsWith('/doctors') ? 'active' : ''}`}
         >
           Find Doctors
         </Link>

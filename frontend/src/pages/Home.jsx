@@ -10,35 +10,21 @@ import {
   Flower2,
   Shield,
   Clock,
-  Star,
-  ChevronDown,
   MapPin,
   Stethoscope,
-  Activity,
   Lock,
   Sparkles,
   ArrowRight,
   BarChart3,
-  Quote,
-  Users,
-  Video,
-  BadgeCheck,
 } from 'lucide-react';
 import api from '../api/api';
 import { formatCurrency } from '../utils/currency';
+import HeroSection from '../components/landing/HeroSection';
+import PremiumCard from '../components/landing/PremiumCard';
+import StatCounter from '../components/landing/StatCounter';
 import './landing.css';
 
-const HERO_LINE1 = ['Healthcare', 'booking,'];
-const HERO_LINE2 = ['reimagined', 'for', '2026.'];
-
 const QUICK_CHIPS = ['Fever', 'Diabetes', 'Heart', 'Skin', 'Migraine', 'Allergy'];
-
-const HERO_TRUST_BADGES = [
-  { icon: Users, label: '10,000+ patients', sub: 'Trusted nationwide' },
-  { icon: Shield, label: 'Secure platform', sub: 'End-to-end encrypted' },
-  { icon: Clock, label: '24/7 access', sub: 'Book anytime' },
-  { icon: Lock, label: 'Clinical-grade security', sub: 'HIPAA-style controls' },
-];
 
 const TRUST_ITEMS = [
   { icon: Shield, label: 'Verified practitioners' },
@@ -108,42 +94,6 @@ const FALLBACK_DOCTORS = [
   { id: '3', name: 'Dr. Ayesha Khan', specialization: 'Dermatologist', treatment_type: 'herbal', city: 'Karachi', consultation_fee: 4500 },
 ];
 
-function useMagnetic(ref) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const onMove = (e) => {
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width / 2) * 0.14;
-      const y = (e.clientY - rect.top - rect.height / 2) * 0.14;
-      el.style.setProperty('--mag-x', `${x}px`);
-      el.style.setProperty('--mag-y', `${y}px`);
-    };
-    const onLeave = () => {
-      el.style.removeProperty('--mag-x');
-      el.style.removeProperty('--mag-y');
-    };
-
-    el.addEventListener('mousemove', onMove);
-    el.addEventListener('mouseleave', onLeave);
-    return () => {
-      el.removeEventListener('mousemove', onMove);
-      el.removeEventListener('mouseleave', onLeave);
-    };
-  }, []);
-}
-
-function MagneticBtn({ className, children, ...props }) {
-  const ref = useRef(null);
-  useMagnetic(ref);
-  return (
-    <Link ref={ref} className={`${className} lp-btn--magnetic`} {...props}>
-      {children}
-    </Link>
-  );
-}
-
 function useScrollReveal(...deps) {
   const ref = useRef(null);
 
@@ -160,11 +110,13 @@ function useScrollReveal(...deps) {
           }
         });
       },
-      { threshold: 0.06, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -32px 0px' }
     );
 
     const observe = () => {
-      el.querySelectorAll('.lp-reveal:not(.is-visible)').forEach((n) => observer.observe(n));
+      el.querySelectorAll('.lp-reveal:not(.is-visible), .lp-reveal-card:not(.is-visible)').forEach((n) =>
+        observer.observe(n)
+      );
     };
     observe();
     const raf = requestAnimationFrame(observe);
@@ -177,49 +129,6 @@ function useScrollReveal(...deps) {
   return ref;
 }
 
-function StatCounter({ end, suffix, label }) {
-  const [value, setValue] = useState(0);
-  const ref = useRef(null);
-  const done = useRef(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting || done.current) return;
-      done.current = true;
-      const start = performance.now();
-      const dur = 2200;
-      const step = (t) => {
-        const p = Math.min((t - start) / dur, 1);
-        const eased = 1 - (1 - p) ** 3;
-        setValue(Math.round(eased * end));
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }, { threshold: 0.2 });
-    obs.observe(node);
-    return () => obs.disconnect();
-  }, [end]);
-
-  const display =
-    suffix === '%'
-      ? `${value}%`
-      : end === 10000
-        ? value >= 10000
-          ? '10,000+'
-          : `${value.toLocaleString('en-PK')}+`
-        : `${value}${suffix}`;
-
-  return (
-    <div className="lp-stat" ref={ref}>
-      <div className="lp-stat__glow" aria-hidden="true" />
-      <div className="lp-stat__num">{display}</div>
-      <div className="lp-stat__label">{label}</div>
-    </div>
-  );
-}
-
 function getInitials(name) {
   return name
     .replace(/^Dr\.\s*/i, '')
@@ -228,90 +137,6 @@ function getInitials(name) {
     .join('')
     .slice(0, 2)
     .toUpperCase();
-}
-
-function HeroFloatCards() {
-  return (
-    <div className="lp-hero-visual" aria-hidden="true">
-      <div className="lp-gradient-ring" />
-      <div className="lp-glow-dot lp-glow-dot--1" />
-      <div className="lp-glow-dot lp-glow-dot--2" />
-      <div className="lp-glow-dot lp-glow-dot--3" />
-
-      {/* Doctor availability */}
-      <div className="lp-float lp-float--doctor animate-float-slow">
-        <div className="lp-float__header">
-          <div className="lp-float__avatar">SC</div>
-          <div>
-            <strong>Dr. Sarah Connor</strong>
-            <span>Cardiologist · Available now</span>
-          </div>
-          <span className="lp-pulse" title="Online" />
-        </div>
-        <div className="lp-float__meta">
-          <span className="lp-float__tag">Verified</span>
-          <span>Next slot · 2:30 PM</span>
-        </div>
-      </div>
-
-      {/* Appointment */}
-      <div className="lp-float lp-float--appt animate-float-slow animate-float-delay">
-        <Calendar size={16} />
-        <div>
-          <strong>Appointment confirmed</strong>
-          <span>Tomorrow · Video consult</span>
-        </div>
-        <CheckCircle size={18} className="lp-float__check" />
-      </div>
-
-      {/* Analytics */}
-      <div className="lp-float lp-float--chart animate-float-slow animate-float-reverse">
-        <div className="lp-float__chart-head">
-          <Activity size={16} />
-          <span>Health analytics</span>
-        </div>
-        <div className="lp-float__bars">
-          {[40, 65, 45, 80, 55, 90].map((h, i) => (
-            <span key={i} style={{ height: `${h}%` }} />
-          ))}
-        </div>
-        <strong>98% care satisfaction</strong>
-      </div>
-
-      {/* Patient success */}
-      <div className="lp-float lp-float--success animate-float-slow animate-float-delay animate-float-reverse">
-        <BadgeCheck size={18} />
-        <div>
-          <strong>Patient success</strong>
-          <span>Booking completed in 47 seconds</span>
-        </div>
-        <Star size={14} className="lp-float__star" />
-      </div>
-
-      {/* Live consultation */}
-      <div className="lp-float lp-float--live animate-float-slow">
-        <span className="lp-live-dot" />
-        <Video size={14} />
-        <span>Live consultation</span>
-      </div>
-
-      <div className="lp-hero-icon lp-hero-icon--1 animate-float-slow animate-float-delay">
-        <Stethoscope size={20} />
-      </div>
-      <div className="lp-hero-icon lp-hero-icon--2 animate-float-slow animate-float-reverse">
-        <Shield size={18} />
-      </div>
-    </div>
-  );
-}
-
-function SectionAmbient({ variant = 'default' }) {
-  return (
-    <div className={`lp-ambient lp-ambient--${variant}`} aria-hidden="true">
-      <div className="lp-ambient__orb" />
-      <div className="lp-ambient__orb lp-ambient__orb--2" />
-    </div>
-  );
 }
 
 const Home = () => {
@@ -323,11 +148,6 @@ const Home = () => {
   const [doctorsLoading, setDoctorsLoading] = useState(true);
 
   const revealRef = useScrollReveal(doctors.length, doctorsLoading);
-
-  useEffect(() => {
-    const hero = document.querySelector('.lp-hero');
-    hero?.querySelectorAll('.lp-reveal').forEach((el) => el.classList.add('is-visible'));
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -366,247 +186,150 @@ const Home = () => {
     [disease, treatmentType, city, navigate]
   );
 
-  let wordDelay = 0;
-  const renderWords = (words, accent = false) =>
-    words.map((word, i) => {
-      const delay = wordDelay++;
-      return (
-        <span
-          key={`${word}-${i}`}
-          className={`lp-hero-word ${accent ? 'lp-hero-word--accent' : ''}`}
-          style={{ animationDelay: `${0.12 + delay * 0.07}s` }}
-        >
-          {word}{' '}
-        </span>
-      );
-    });
-
   return (
     <div className="landing-page" ref={revealRef}>
-      {/* ─── HERO ─── */}
-      <section className="lp-hero" id="top">
-        <div className="lp-hero-bg" aria-hidden="true">
-          <div className="lp-orb lp-orb--1" />
-          <div className="lp-orb lp-orb--2" />
-          <div className="lp-orb lp-orb--3" />
-          <div className="lp-orb lp-orb--4" />
-          <div className="lp-ray lp-ray--1" />
-          <div className="lp-ray lp-ray--2" />
-          <div className="lp-ray lp-ray--3" />
-          <div className="lp-streak lp-streak--1" />
-          <div className="lp-streak lp-streak--2" />
-          <div className="lp-mesh-gradient" />
-          <div className="lp-mesh-gradient lp-mesh-gradient--2" />
-          <div className="lp-noise" />
-          <div className="lp-grid-lines" />
-          <div className="lp-particles" aria-hidden="true">
-            {[...Array(14)].map((_, i) => (
-              <span key={i} className="lp-particle" style={{ '--i': i }} />
-            ))}
+      <HeroSection />
+
+      <section className="lp-hero-search lp-reveal">
+        <div className="lp-hero-search__inner">
+          <div className="lp-field lp-field--inline">
+            <label htmlFor="disease" className="sr-only">Condition</label>
+            <input
+              id="disease"
+              placeholder="Search by condition…"
+              value={disease}
+              onChange={(e) => setDisease(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            />
           </div>
-        </div>
-
-        <div className="lp-hero-stage">
-          <div className="lp-hero-copy">
-            <div className="lp-badge lp-reveal">
-              <span className="lp-badge__dot" />
-              Trusted healthcare platform · Pakistan
-            </div>
-
-            <h1 className="lp-hero-title">
-              <span className="lp-hero-title__line">{renderWords(HERO_LINE1, false)}</span>
-              <span className="lp-hero-title__line lp-hero-title__line--accent">
-                {renderWords(HERO_LINE2.slice(0, 2), true)}
-                <span className="lp-hero-shimmer">{HERO_LINE2[2]}</span>
-              </span>
-            </h1>
-
-            <div className="lp-hero-trust lp-reveal" style={{ transitionDelay: '0.28s' }}>
-              {HERO_TRUST_BADGES.map(({ icon: Icon, label, sub }) => (
-                <div key={label} className="lp-hero-trust__badge">
-                  <div className="lp-hero-trust__icon">
-                    <Icon size={16} />
-                  </div>
-                  <div>
-                    <strong>{label}</strong>
-                    <span>{sub}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="lp-hero-lead lp-reveal" style={{ transitionDelay: '0.35s' }}>
-              The modern care OS for patients, doctors, assistants, and admins — search specialists,
-              book visits, verify payments, and manage clinical records in one beautiful workflow.
-            </p>
-
-            <div className="lp-hero-cta lp-reveal" style={{ transitionDelay: '0.45s' }}>
-              <MagneticBtn to="/doctors" className="lp-btn lp-btn--primary lp-btn--shine lp-btn--premium">
-                Find a doctor
-                <ArrowRight size={18} />
-              </MagneticBtn>
-              <MagneticBtn to="/register" className="lp-btn lp-btn--glass lp-btn--premium">
-                Create free account
-              </MagneticBtn>
-            </div>
-
-            <div className="lp-search-glass lp-reveal" style={{ transitionDelay: '0.55s' }}>
-              <div className="lp-search-grid">
-                <div className="lp-field">
-                  <label htmlFor="disease">Condition</label>
-                  <input
-                    id="disease"
-                    placeholder="Fever, diabetes…"
-                    value={disease}
-                    onChange={(e) => setDisease(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                </div>
-                <div className="lp-field">
-                  <label htmlFor="treatment">Modality</label>
-                  <select id="treatment" value={treatmentType} onChange={(e) => setTreatmentType(e.target.value)}>
-                    <option value="">All types</option>
-                    <option value="allopathic">Allopathic</option>
-                    <option value="homeopathic">Homeopathic</option>
-                    <option value="herbal">Herbal</option>
-                  </select>
-                </div>
-                <div className="lp-field">
-                  <label htmlFor="city">City</label>
-                  <input
-                    id="city"
-                    placeholder="Lahore, Karachi…"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                </div>
-                <button type="button" className="lp-btn lp-btn--primary lp-btn--search lp-btn--shine lp-btn--premium" onClick={() => handleSearch()}>
-                  <Search size={18} />
-                  Search
-                </button>
-              </div>
-              <div className="lp-chips">
-                {QUICK_CHIPS.map((chip) => (
-                  <button key={chip} type="button" className="lp-chip" onClick={() => { setDisease(chip); handleSearch(chip); }}>
-                    {chip}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="lp-field lp-field--inline">
+            <label htmlFor="city" className="sr-only">City</label>
+            <input
+              id="city"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            />
           </div>
-
-          <HeroFloatCards />
+          <select
+            id="treatment"
+            className="lp-field-select"
+            value={treatmentType}
+            onChange={(e) => setTreatmentType(e.target.value)}
+            aria-label="Treatment modality"
+          >
+            <option value="">All modalities</option>
+            <option value="allopathic">Allopathic</option>
+            <option value="homeopathic">Homeopathic</option>
+            <option value="herbal">Herbal</option>
+          </select>
+          <button type="button" className="lp-btn lp-btn--primary" onClick={() => handleSearch()}>
+            <Search size={18} />
+            Search
+          </button>
         </div>
-
-        <button type="button" className="lp-scroll-hint" onClick={() => document.getElementById('lp-stats')?.scrollIntoView({ behavior: 'smooth' })} aria-label="Scroll">
-          <ChevronDown size={24} />
-        </button>
+        <div className="lp-chips">
+          {QUICK_CHIPS.map((chip) => (
+            <button key={chip} type="button" className="lp-chip" onClick={() => { setDisease(chip); handleSearch(chip); }}>
+              {chip}
+            </button>
+          ))}
+        </div>
       </section>
 
-      {/* Trust strip */}
-      <section className="lp-trust-strip">
+      <section className="lp-trust-strip" id="about">
         <div className="lp-trust-strip__inner">
           {TRUST_ITEMS.map(({ icon: Icon, label }) => (
             <div key={label} className="lp-trust-item">
-              <Icon size={18} />
+              <Icon size={16} strokeWidth={2} />
               <span>{label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Stats */}
       <section className="lp-stats" id="lp-stats">
-        <SectionAmbient variant="stats" />
-        <div className="lp-stats__card lp-reveal lp-reveal--up">
-          <StatCounter end={500} suffix="+" label="Verified doctors" />
-          <StatCounter end={10000} suffix="+" label="Patients served" />
-          <StatCounter end={3} suffix="" label="Treatment modalities" />
-          <StatCounter end={98} suffix="%" label="Satisfaction rate" />
+        <div className="lp-stats__card">
+          <StatCounter end={500} suffix="+" label="Verified doctors" revealIndex={0} />
+          <StatCounter end={10000} suffix="+" label="Patients served" revealIndex={1} />
+          <StatCounter end={3} suffix="" label="Treatment modalities" revealIndex={2} />
+          <StatCounter end={98} suffix="%" label="Satisfaction rate" revealIndex={3} />
         </div>
       </section>
 
-      {/* Features */}
-      <section className="lp-section lp-section--glow">
-        <SectionAmbient variant="features" />
-        <div className="lp-section-head lp-reveal lp-reveal--fade">
+      <section className="lp-section" id="features">
+        <div className="lp-section-head lp-reveal">
           <p className="lp-eyebrow">Platform</p>
-          <h2 className="lp-h2">
-            Built for <span className="lp-text-gradient">modern clinical teams</span>
-          </h2>
-          <p className="lp-sub">Everything your healthcare operation needs — without the legacy software baggage.</p>
+          <h2 className="lp-h2">Built for modern clinical teams</h2>
+          <p className="lp-sub">Everything your healthcare operation needs — without legacy software baggage.</p>
         </div>
         <div className="lp-feature-grid">
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             return (
-              <article key={f.title} className="lp-feature-card lp-feature-card--glass lp-reveal lp-reveal--up" style={{ transitionDelay: `${i * 0.12}s` }}>
+              <PremiumCard key={f.title} className="lp-feature-card" revealIndex={i}>
                 <div className="lp-feature-card__icon">
-                  <Icon size={24} />
+                  <Icon size={22} strokeWidth={1.75} />
                 </div>
                 <h3>{f.title}</h3>
                 <p>{f.desc}</p>
-              </article>
+              </PremiumCard>
             );
           })}
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="lp-section lp-section--mesh lp-section--glow">
-        <SectionAmbient variant="mesh" />
-        <div className="lp-section-head lp-reveal lp-reveal--fade">
+      <section className="lp-section lp-section--alt" id="how-it-works">
+        <div className="lp-section-head lp-reveal">
           <p className="lp-eyebrow">Workflow</p>
-          <h2 className="lp-h2">From search to <span className="lp-text-gradient">confirmed visit</span></h2>
+          <h2 className="lp-h2">From search to confirmed visit</h2>
         </div>
         <div className="lp-steps">
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
             return (
-              <div key={step.title} className="lp-step lp-reveal" style={{ transitionDelay: `${idx * 0.08}s` }}>
+              <PremiumCard key={step.title} className="lp-step" revealIndex={idx}>
+                <span className="lp-step__num">{idx + 1}</span>
                 <div className="lp-step__icon">
-                  <span className="lp-step__num">{idx + 1}</span>
-                  <Icon size={22} />
+                  <Icon size={20} strokeWidth={1.75} />
                 </div>
                 <h4>{step.title}</h4>
                 <p>{step.desc}</p>
-              </div>
+              </PremiumCard>
             );
           })}
         </div>
       </section>
 
-      {/* Treatments */}
       <section className="lp-section">
         <div className="lp-section-head lp-reveal">
           <p className="lp-eyebrow">Modalities</p>
-          <h2 className="lp-h2">Every path to <span className="lp-text-gradient">wellness</span></h2>
+          <h2 className="lp-h2">Every path to wellness</h2>
         </div>
         <div className="lp-treatment-grid">
           {TREATMENTS.map((t, i) => {
             const Icon = t.icon;
             return (
-              <article key={t.type} className="lp-treatment lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
+              <PremiumCard key={t.type} className="lp-treatment" revealIndex={i}>
                 <div className="lp-treatment__icon">
-                  <Icon size={26} />
+                  <Icon size={22} strokeWidth={1.75} />
                 </div>
                 <h3>{t.title}</h3>
                 <p>{t.desc}</p>
                 <Link to={`/doctors?treatment_type=${t.type}`} className="lp-link-arrow">
                   Explore specialists <ArrowRight size={14} />
                 </Link>
-              </article>
+              </PremiumCard>
             );
           })}
         </div>
       </section>
 
-      {/* Featured doctors */}
       <section className="lp-section lp-section--alt">
         <div className="lp-section-head lp-reveal">
           <p className="lp-eyebrow">Practitioners</p>
-          <h2 className="lp-h2">Featured <span className="lp-text-gradient">doctors</span></h2>
+          <h2 className="lp-h2">Featured doctors</h2>
         </div>
         <div className="lp-doctors-grid">
           {doctorsLoading
@@ -623,7 +346,7 @@ const Home = () => {
                 const docCity =
                   (Array.isArray(doc.Clinics) && doc.Clinics[0]?.city) || doc.city || 'Pakistan';
                 return (
-                  <article key={doc.id} className="lp-doctor lp-reveal" style={{ transitionDelay: `${idx * 0.12}s` }}>
+                  <PremiumCard key={doc.id} className="lp-doctor" revealIndex={idx}>
                     <div className="lp-doctor__avatar">{getInitials(userName)}</div>
                     <h4>{userName}</h4>
                     <p className="lp-doctor__spec">{spec}</p>
@@ -635,28 +358,31 @@ const Home = () => {
                     <Link to={`/doctors/${doc.id}`} className="lp-btn lp-btn--primary lp-btn--block">
                       Book now
                     </Link>
-                  </article>
+                  </PremiumCard>
                 );
               })}
         </div>
         <div className="lp-section-cta lp-reveal">
-          <Link to="/doctors" className="lp-btn lp-btn--glass">
+          <Link to="/doctors" className="lp-btn lp-btn--secondary">
             View all doctors <ArrowRight size={16} />
           </Link>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="lp-section lp-section--mesh lp-section--glow">
-        <SectionAmbient variant="testimonials" />
-        <div className="lp-section-head lp-reveal lp-reveal--fade">
-          <p className="lp-eyebrow">Social proof</p>
-          <h2 className="lp-h2">Loved by <span className="lp-text-gradient">patients & clinics</span></h2>
+      <section className="lp-section">
+        <div className="lp-section-head lp-reveal">
+          <p className="lp-eyebrow">Testimonials</p>
+          <h2 className="lp-h2">Trusted by patients and clinics</h2>
         </div>
         <div className="lp-testimonials">
           {TESTIMONIALS.map((t, i) => (
-            <blockquote key={t.name} className="lp-testimonial lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-              <Quote size={28} className="lp-testimonial__quote" />
+            <PremiumCard
+              key={t.name}
+              as="blockquote"
+              className="lp-testimonial"
+              variant="testimonial"
+              revealIndex={i}
+            >
               <p>{t.quote}</p>
               <footer>
                 <span className="lp-testimonial__avatar">{t.initials}</span>
@@ -665,44 +391,38 @@ const Home = () => {
                   <span>{t.role}</span>
                 </div>
               </footer>
-            </blockquote>
+            </PremiumCard>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
       <section className="lp-cta">
-        <div className="lp-cta__bg" aria-hidden="true">
-          <div className="lp-orb lp-orb--cta" />
-          <div className="lp-ray lp-ray--cta" />
-        </div>
         <div className="lp-cta__inner lp-reveal">
-          <p className="lp-eyebrow lp-eyebrow--light">Get started today</p>
-          <h2 className="lp-cta__title">Ready to transform how your clinic delivers care?</h2>
+          <p className="lp-eyebrow lp-eyebrow--light">Get started</p>
+          <h2 className="lp-cta__title">Ready to simplify how your clinic delivers care?</h2>
           <p className="lp-cta__sub">
-            Join thousands of patients and practitioners on Pakistan&apos;s most modern healthcare booking platform.
+            Join patients and practitioners on Pakistan&apos;s modern healthcare booking platform.
           </p>
           <div className="lp-cta__actions">
-            <MagneticBtn to="/register" className="lp-btn lp-btn--white lp-btn--shine lp-btn--premium">
+            <Link to="/register" className="lp-btn lp-btn--white">
               Start for free
               <ArrowRight size={18} />
-            </MagneticBtn>
+            </Link>
             <Link to="/doctors" className="lp-btn lp-btn--outline-light">
               Browse doctors
             </Link>
           </div>
           <p className="lp-cta__trust">
-            <CheckCircle size={14} /> No credit card · Admin-approved doctors · PKR payments
+            No credit card · Admin-approved doctors · PKR payments
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="lp-footer">
+      <footer className="lp-footer" id="contact">
         <div className="lp-footer__inner">
           <div className="lp-footer__brand">
             <Link to="/" className="lp-footer__logo">
-              <Stethoscope size={24} />
+              <Stethoscope size={22} />
               <span>Doctor Hub</span>
             </Link>
             <p>Pakistan&apos;s trusted healthcare consultation platform.</p>

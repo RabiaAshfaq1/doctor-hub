@@ -7,10 +7,9 @@ const { Op } = require('sequelize');
  */
 const getAllDoctors = async (req, res, next) => {
   try {
-    const { specialization, treatment_type, search } = req.query;
+    const { specialization, treatment_type, search, city } = req.query;
 
     const doctorQuery = { is_approved: true };
-    const userQuery = {};
 
     if (specialization) {
       doctorQuery.specialization = { [Op.like]: `%${specialization}%` };
@@ -20,23 +19,30 @@ const getAllDoctors = async (req, res, next) => {
       doctorQuery.treatment_type = treatment_type.toLowerCase();
     }
 
+    const userInclude = {
+      model: User,
+      attributes: ['name', 'email', 'phone'],
+      required: false
+    };
     if (search) {
-      userQuery.name = { [Op.like]: `%${search}%` };
+      userInclude.where = { name: { [Op.like]: `%${search}%` } };
+      userInclude.required = true;
+    }
+
+    const clinicInclude = {
+      model: Clinic,
+      attributes: ['id', 'name', 'address', 'city', 'timings_json'],
+      required: false
+    };
+    if (city) {
+      clinicInclude.where = { city: { [Op.like]: `%${city}%` } };
+      clinicInclude.required = true;
     }
 
     const doctors = await Doctor.findAll({
       where: doctorQuery,
-      include: [
-        {
-          model: User,
-          where: userQuery,
-          attributes: ['name', 'email', 'phone']
-        },
-        {
-          model: Clinic,
-          attributes: ['id', 'name', 'address', 'city', 'timings_json']
-        }
-      ]
+      include: [userInclude, clinicInclude],
+      order: [['specialization', 'ASC']]
     });
 
     res.status(200).json({ success: true, count: doctors.length, doctors });

@@ -276,7 +276,7 @@ const Register = () => {
                   >
                     <option value="allopathic">Allopathic</option>
                     <option value="homeopathic">Homeopathic</option>
-                    <option value="ayurvedic">Ayurvedic</option>
+                    <option value="herbal">Herbal</option>
                   </select>
                 </div>
               </div>

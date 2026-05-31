@@ -63,7 +63,7 @@ const PublicLayout = ({ children }) => {
 const LandingLayout = ({ children }) => {
   return (
     <div className="app-container landing-app">
-      <Navbar variant="landing" />
+      <Navbar />
       <main className="landing-main">{children}</main>
     </div>
   );
