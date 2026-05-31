@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: doctor-hub-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DB_DIALECT
+        value: sqlite
+      - key: DB_STORAGE
+        value: ./database.sqlite
+      - key: FRONTEND_URL
+        sync: false
